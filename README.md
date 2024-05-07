@@ -9,10 +9,10 @@ In this part, a Flask API was designed to handle both static and dynamic routes 
 
 For static routes, the following endpoints were created:
 
-**Precipitation Route:**
+-**Precipitation Route:**
 -Returns JSON data with the date as the key and the precipitation value for the last 12 months.
 
-**Stations Route:**
+-**Stations Route:**
 Provides data for all weather stations in the database.
 
 **TOBs Route:**
