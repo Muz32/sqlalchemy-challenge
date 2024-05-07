@@ -33,7 +33,7 @@ The data for this assignemnt challenge was provided by EdX LLC. The dataset cove
   - `climate.ipynb`
   - `app.py`
    - `Resources`
-    - `hawaii.sqlite`
-    - `hawaii_measurements.csv`
-    - `hawaii_stations.csv`
+     - `hawaii.sqlite`
+     - `hawaii_measurements.csv`
+     - `hawaii_stations.csv`
     
