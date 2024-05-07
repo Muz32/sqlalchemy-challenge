@@ -1,4 +1,4 @@
-# SQLAlchemy Challenge
+# sqlalchemy challenge
 
 In this assignment challenge, I use SQLAlchemy to connect to a SQLite database containing climate data to perform various analyses. Additionally, I designed a Flask API to return various queries from the SQLite database. This assignment challenge is divided into two parts:
 
