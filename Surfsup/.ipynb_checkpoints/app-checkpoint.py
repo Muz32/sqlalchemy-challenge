@@ -1,13 +1,10 @@
-# Import the dependencies.
-import sqlalchemy
+# Import the dependencies
+
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
-from sqlalchemy import create_engine, func
+from sqlalchemy import create_engine, func, and_
 import datetime as dt
-import numpy as np
-from sqlalchemy import and_
 from flask import Flask, jsonify
-
 
 #################################################
 # Database Setup
@@ -40,14 +37,24 @@ app = Flask(__name__)
 def welcome():
     """List all available api routes."""
     return (
-        "Welcome to the Weather API of Hawaii!<br/>"
-        "Available Routes:<br/>"
+        "<h1><strong>Welcome to the Weather API for Hawaii!</strong></h1><br/><br/>"
+        
+        "<strong>Available API Static Routes:</strong><br/>"
         "/api/v1.0/precipitation<br/>"
         "/api/v1.0/stations<br/>"
-        "/api/v1.0/tobs<br/>"
-        "/api/v1.0/start_date/2010-01-01<br/>"  
-        "/api/v1.0/start_and_end_date/2016-08-10/2017-08-18<br/>"
+        "/api/v1.0/tobs<br/><br/>"
+        
+        "<strong>Available API Dynamic Routes:</strong><br/>"
+        "/api/v1.0/start_date/<br/>"  
+        "/api/v1.0/start_date_and_end_date/<string:start_date>/<string:end_date><br/><br/>"
+        
+        "<strong>Note:</strong><br/>"
+        "The dynamic routes return minimum, maximum, and average temperatures for inputted dates. " 
+        "The specified dates must be typed in this format DD-MM-YYYY.<br/>"
+        "Example 1: /api/v1.0/start_date/10-05-2015.<br/>Example 2: /api/v1.0/start_date_and_end_date/15-07-2010/20-09-2016.<br/>"
+        "The dataset covers the period from 01-01-2010 to 23-08-2017.<br/>"
     )
+
 @app.route("/api/v1.0/precipitation")
 def precipitation():
     """Return the precipitation data as a dictionary with date as the key and a single dictionary of stations and their precipitation values as the value."""
@@ -122,81 +129,62 @@ def temperature_observations():
         return jsonify({"Most Active Station": most_active_station_id, "Temperature Observations (tobs)": tobs_list})
     else:
         return jsonify({"message": "No data found."}), 404
-@app.route("/api/v1.0/start_date/<start_date>")
 
-def temperature_stats_with_start_date(start_date='2010-01-01'):
-    """Return a JSON list of the minimum, average, and maximum temperature for the specified start date and most active station USC00519281"""
-    station_id = 'USC00519281'
-
-    # Convert the input start_date string to a datetime object
-    start_date = dt.datetime.strptime(start_date, "%Y-%m-%d").date()
-
-    # Query to calculate temperature statistics from the specified start date to the last date in the date column
-    temps_query = session.query(func.min(Measurement.tobs), func.max(Measurement.tobs), func.avg(Measurement.tobs)).\
-        filter(and_(Measurement.station == station_id, Measurement.date >= start_date)).all()
-
-    # Extract the temperature statistics from the query result
-    min_temp, max_temp, avg_temp = temps_query[0]
-
-    # Create a dictionary to hold the temperature statistics
-    temp_stats = {'start_date': start_date.strftime("%Y-%m-%d"),
-                  'station_id': station_id,
-                  'min_temp': min_temp,
-                  'max_temp': max_temp,
-                  'avg_temp': avg_temp}
-
-    return jsonify(temp_stats)
 
 
 @app.route("/api/v1.0/start_date/<start_date>")
-def temperature_with_start_date(start_date='2010-01-01'):
-    """Return a JSON list of the minimum, average, and maximum temperature for the specified start date and most active station USC00519281"""
-    station_id = 'USC00519281'
+def temperature_with_start_date(start_date):
+    """Return a JSON list of temperature statistics for all stations within the specified start date range."""
 
-    # Convert the input start_date string to a datetime object
-    start_date = dt.datetime.strptime(start_date, "%Y-%m-%d").date()
+    # Convert the input start_date string to a datetime object with format DD-MM-YYYY
+    start_date = dt.datetime.strptime(start_date, "%d-%m-%Y").date()
 
-    # Query to calculate temperature statistics from the specified start date to the last date in the date column
-    temps_query = session.query(func.min(Measurement.tobs), func.max(Measurement.tobs), func.avg(Measurement.tobs)).\
-        filter(and_(Measurement.station == station_id, Measurement.date >= start_date)).all()
+    # Query to calculate temperature statistics for all stations within the specified start date range
+    temps_query = session.query(Station.name, Measurement.station, func.min(Measurement.tobs), func.max(Measurement.tobs), func.avg(Measurement.tobs)).\
+        join(Measurement, Measurement.station == Station.station).\
+        filter(Measurement.date >= start_date).\
+        group_by(Station.name, Measurement.station).all()
 
-    # Extract the temperature statistics from the query result
-    min_temp, max_temp, avg_temp = temps_query[0]
+    # Create a list to hold the temperature statistics for different stations
+    temp_stats_list = []
+    for station_name, station_id, min_temp, max_temp, avg_temp in temps_query:
+        temp_stats = {'station_name': station_name,
+                      'station_id': station_id,
+                      'min_temp': min_temp,
+                      'max_temp': max_temp,
+                      'avg_temp': avg_temp}
+        temp_stats_list.append(temp_stats)
 
-    # Create a dictionary to hold the temperature statistics
-    temp_stats = {'start_date': start_date.strftime("%Y-%m-%d"),
-                  'station_id': station_id,
-                  'min_temp': min_temp,
-                  'max_temp': max_temp,
-                  'avg_temp': avg_temp}
+    # Use jsonify with sort_keys=False to maintain the order of keys in the JSON response
+    return jsonify(temp_stats_list)
 
-    return jsonify(temp_stats)
 
-@app.route("/api/v1.0/start_and_end_date/<start_date>/<end_date>")
-def temperature_stats_with_start_and_end_date(start_date='2016-08-10', end_date='2017-08-18'):
-    """Return a JSON list of the minimum, average, and maximum temperature for the specified start and end dates and most active station USC00519281"""
-    station_id = 'USC00519281'
-
+@app.route("/api/v1.0/start_date_and_end_date/<string:start_date>/<string:end_date>")
+def temperature_stats_with_start_and_end_date(start_date, end_date):
+    """Return a JSON list of temperature statistics for different stations within the specified start and end dates."""
+    
     # Convert the input start_date and end_date strings to datetime objects
-    start_date = dt.datetime.strptime(start_date, "%Y-%m-%d").date()
-    end_date = dt.datetime.strptime(end_date, "%Y-%m-%d").date()
+    start_date = dt.datetime.strptime(start_date, "%d-%m-%Y").date()
+    end_date = dt.datetime.strptime(end_date, "%d-%m-%Y").date()
 
-    # Query to calculate temperature statistics for the specified start and end dates and the most active station
-    temps_query = session.query(func.min(Measurement.tobs), func.max(Measurement.tobs), func.avg(Measurement.tobs)).\
-        filter(and_(Measurement.station == station_id, Measurement.date >= start_date, Measurement.date <= end_date)).all()
+    # Query to calculate temperature statistics for the specified start and end dates and all stations
+    temps_query = session.query(Station.name, Measurement.station, func.min(Measurement.tobs), func.max(Measurement.tobs), func.avg(Measurement.tobs)).\
+        join(Measurement, Measurement.station == Station.station).\
+        filter(and_(Measurement.date >= start_date, Measurement.date <= end_date)).\
+        group_by(Station.name, Measurement.station).all()
 
-    # Extract the temperature statistics from the query result
-    min_temp, max_temp, avg_temp = temps_query[0]
+    # Create a list to hold the temperature statistics for different stations
+    temp_stats_list = []
+    for station_name, station_id, min_temp, max_temp, avg_temp in temps_query:
+        temp_stats = {'station_name': station_name,
+                      'station_id': station_id,
+                      'min_temp': min_temp,
+                      'max_temp': max_temp,
+                      'avg_temp': avg_temp}
+        temp_stats_list.append(temp_stats)
 
-    # Create a dictionary to hold the temperature statistics
-    temp_stats = {'start_date': start_date.strftime("%Y-%m-%d"),
-                  'end_date': end_date.strftime("%Y-%m-%d"),
-                  'station_id': station_id,
-                  'min_temp': min_temp,
-                  'max_temp': max_temp,
-                  'avg_temp': avg_temp}
+    return jsonify(temp_stats_list)
 
-    return jsonify(temp_stats)
 
 if __name__ == "__main__":
     app.run(debug=True)
