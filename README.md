@@ -5,7 +5,7 @@ In this assignment challenge, I use SQLAlchemy to connect to a SQLite database c
 ## Part 1: Analyzing and Exploring the Climate Data
 I analyzed weather data for precipitation (prcp) and temperature observations (tobs) across different stations. The analysis involved converting queried results from the ORM (Object Relational Mapper) to pandas dataframes and plotting the results. This part was completed using Jupyter Notebook, and the code is contained in the file named 'climate.ipynb'.
 
-## Part 2: Design Your Climate App
+## Part 2: Designing a Climate App
 In this part, a Flask API was designed to handle both static and dynamic routes for queried climate data. The code for the app design is contained in the 'app.py' file.
 
 For static routes, the following endpoints were created:
