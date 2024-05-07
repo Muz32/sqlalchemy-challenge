@@ -11,8 +11,10 @@ For static routes, the following endpoints were created:
 
 **Precipitation Route:**
 -Returns JSON data with the date as the key and the precipitation value for the last 12 months.
+
 **Stations Route:**
 Provides data for all weather stations in the database.
+
 **TOBs Route:**
 -Retrieves data for the most active station in the last 12 months.
 
@@ -21,6 +23,7 @@ For dynamic routes, the following endpoints were implemented:
 **Start Route:**
 -Accepts the start date as a parameter from the URL.
 -Returns the minimum, maximum, and average temperatures calculated from the given start date to the end of the dataset.
+
 **Start/End Route:**
 -Accepts both the start and end dates as parameters from the URL.
 -Returns the minimum, maximum, and average temperatures calculated from the given start date to the given end date.
