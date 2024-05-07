@@ -25,5 +25,15 @@ For dynamic routes, the following endpoints were implemented:
         -Example 1: /api/v1.0/start_date/10-05-2015.
         -Example 2: /api/v1.0/start_date_and_end_date/15-07-2010/20-09-2016.
     
-##Source of data
+## Source of data
 The data for this assignemnt challenge was provided by EdX LLC. The dataset covers the period from 01-01-2010 to 23-08-2017. All data files are contained in the Resources folder inside the 'Surfup' folder. 
+
+## Folders and Files
+- `Surfsup`
+  - `climate.ipynb`
+  - `app.py`
+   - `Resources`
+    - `hawaii.sqlite`
+    - `hawaii_measurements.csv`
+    - `hawaii_stations.csv`
+    
