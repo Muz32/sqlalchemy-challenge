@@ -19,9 +19,9 @@ For dynamic routes, the following endpoints were implemented:
 - **Start Route**: Accepts the start date as a parameter from the URL and calculates the minimum, maximum, and average temperatures from the given start date to the end of the dataset.
 - **Start/End Route**: Accepts both the start and end dates as parameters from the URL and calculates the minimum, maximum, and average temperatures from the given start date to the given end date.
 
-**Please note**: For dynamic routes, the specified dates must be typed in this format DD-MM-YYYY.
-- Example 1: `/api/v1.0/start_date/10-05-2015`
-- Example 2: `/api/v1.0/start_date_and_end_date/15-07-2010/20-09-2016`
+**Please note**: For dynamic routes, the specified dates must be typed in this format DD-MM-YYYY in place of <start> and <end>
+- Example 1: `/api/v1.0/10-05-2015`
+- Example 2: `/api/v1.0/15-07-2010/20-09-2016`
 
 ## Source of Data
 The data for this assignment challenge was provided by EdX LLC. The dataset covers the period from 01-01-2010 to 23-08-2017. All data files are contained in the 'Resources' folder inside the 'Surfsup' directory.
