@@ -19,7 +19,7 @@ For dynamic routes, the following endpoints were implemented:
 - **Start Route**: Accepts the start date as a parameter from the URL and calculates the minimum, maximum, and average temperatures from the given start date to the end of the dataset.
 - **Start/End Route**: Accepts both the start and end dates as parameters from the URL and calculates the minimum, maximum, and average temperatures from the given start date to the given end date.
 
-**Please note**: For dynamic routes, the specified dates must be typed in this format DD-MM-YYYY in place of <start> and <end>
+**Please note**: For dynamic routes, the specified dates must be typed in this format DD-MM-YYYY in place of &lt;start&gt; and &lt;end&gt;
 - Example 1: `/api/v1.0/10-05-2015`
 - Example 2: `/api/v1.0/15-07-2010/20-09-2016`
 
